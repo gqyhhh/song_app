@@ -360,11 +360,138 @@ def like(request):
 '''
 
 
-def MyRecommend(request):
-    if request.method == "GET":
-        return render(request, 'Mylist/MyRecommend.html')
+def generate_recommendations(user_id):
+    cursor = musicdb.cursor()
+    input = (user_id, user_id)
+    sql = "SELECT user.Username, COUNT(album) FROM MyApp_list l, user u WHERE l.Username = %s AND album IN (SELECT album FROM MyApp_list WHERE MyApp_list.Username = u.Username AND MyApp_list.Username <> %s) GROUP BY u.Username ORDER BY COUNT(album) DESC LIMIT 10;"
+    cursor.execute(sql,input)
+    result_pool = cursor.fetchall()
+    if len(result_pool) == 0:
+        top_album = get_top_album(user_id)
+        sql = "SELECT DISTINCT SongId FROM Songs WHERE album = %s AND SongId NOT IN (SELECT SongId FROM Likes WHERE Username = %s) LIMIT 10"
+        val = (top_album,user_id)
+        cursor.execute(sql,val)
+        result = cursor.fetchall()
+        if len(result) == 0:
+            random_song_sql = "SELECT SongId FROM Songs ORDER BY rate LIMIT 10"
+            cursor.execute(random_song_sql)
+            result = cursor.fetchall()
+        session['recs'] = result
+        return
+    scores = {}
+    for user in result:
+        scores[user[0]] = generate_recommendation_score(user_id, )
+    best = get_result(scores)
+    cursor.close()
+    session['list'] = best
+
+def generate_recommendation_score(current_user,song_id):
+    if get_top_album(current_user) == get_album(song_id):
+        score += 60
+    if get_top_singer(current_user) == get_singer(song_id):
+        score += 30
+    if  get_top_genre(current_user) == get_genre(song_id):
+        score += 10
+    return score
+
+def get_result(scores):
+    count = Counter(scores)
+    return count.most_common(10)
+
+def get_top_album(user):
+    cursor = musicdb.cursor()
+    sql = "SELECT album, COUNT(album) FROM (SELECT SongId FROM MyApp_list l WHERE Username = %s) temp JOIN Songs ON temp.SongId = Songs.SongId GROUP BY album ORDER BY COUNT(album) DESC LIMIT 1"
+    val = (user,)
+    cursor.execute(sql, val)
+    result = cursor.fetchone()
+    return result[0]
+
+def get_top_singer(user):
+    cursor = musicdb.cursor()
+    sql = "SELECT singer_name, COUNT(singer_name) FROM (SELECT SongId FROM MyApp_list l WHERE Username = %s) temp JOIN Songs ON temp.SongId = Songs.SongId GROUP BY singer_name ORDER BY COUNT(singer_name) DESC LIMIT 1"
+
+    val = (user,)
+    cursor.execute(sql, val)
+    result = cursor.fetchone()
+    return result[0]
 
 
+def get_top_genre(user):
+    cursor = musicdb.cursor()
+    sql = "SELECT genre, COUNT(genre) FROM (SELECT SongId FROM MyApp_list l WHERE Username = %s) temp JOIN Songs ON temp.SongId = Songs.SongId GROUP BY genre ORDER BY COUNT(genre) DESC LIMIT 1"
+
+    val = (user,)
+    cursor.execute(sql, val)
+    result = cursor.fetchone()
+    return result[0]
+
+def get_genre(song):
+    cursor = musicdb.cursor()
+    sql = "SELECT genre from Songs WHERE (SongId = song.SongId)GROUP BY genre"
+    cursor.execute(sql)
+    result = cursor.fetchone()
+    return result[0]
+def get_album(song):
+    cursor = musicdb.cursor()
+    sql = "SELECT album from Songs WHERE (SongId = song.SongId)GROUP BY album"
+    cursor.execute(sql)
+    result = cursor.fetchone()
+    return result[0]
+def get_singer(song):
+    cursor = musicdb.cursor()
+    sql = "SELECT singer_name from Songs WHERE (SongId = song.SongId)GROUP BY singer_name"
+    cursor.execute(sql)
+    result = cursor.fetchone()
+    return result[0]
+
+# def MyRecommend(request):
+#     if request.method == "GET":
+#         user_name = request.session['user_name']
+#         user_id = User.objects.filter(user_name=user_name).values('id')[0]['id']
+#         pool= List.objects.filter(user = user_id )
+#         if len(pool) == 0:
+#             results = Song.objects.order_by('-rate')[:10]
+#             context = {'list': results}
+#             return render(request, 'Mylist/MyRecommend.html', context=context)
+#         else:
+#             id = User.objects.filter(user_name=user_name).values('id')[0]['id']
+#             genre_pool =  List.objects.filter(user=id).annotate(genre_count=Count('genre')).order_by('-genre_count')[:2]
+#             album_pool = List.objects.filter(user=id).annotate(album_count=Count('album')).order_by('-album_count')[:2]
+#             singer_pool = List.objects.filter(user=id).annotate(singer_count=Count('singer_name')).order_by('-singer_count')[:2]
+#             genre_first = genre_pool[0].genre
+#             genre_second = genre_pool[0].genre
+#             if len(genre_pool) > 1:
+#                 genre_second = genre_pool[1].genre
+#             else:
+#                 genre_second = genre_pool[0].genre
+#             album_first = album_pool[0].album
+#             album_second = album_pool[0].album
+#             if len(album_pool) > 1:
+#                 album_second = album_pool[1].album
+#             else:
+#                 album_second = album_pool[0].album
+#             singer_first = singer_pool[0].singer_name
+#             singer_second = singer_pool[0].singer_name
+#             if len(singer_pool) > 1:
+#                 singer_second = singer_pool[1].singer_name
+#             else:
+#                 singer_second = singer_pool[0].singer_name
+#
+#             candidate_genre_1 = Song.objects.filter(genre = genre_first)
+#             candidate_genre_2 = Song.objects.filter(genre = genre_second)
+#             candidate_album_1 = Song.objects.filter(album = album_first)
+#             candidate_album_2 = Song.objects.filter(album = album_second)
+#             candidate_singer_1 = Song.objects.filter(singer_name = singer_first)
+#             candidate_singer_2 = Song.objects.filter(singer_name = singer_second)
+#             results_pool = (candidate_album_2|candidate_album_1)
+#             result = ( candidate_singer_2 | candidate_singer_1 | candidate_genre_2| candidate_genre_1)
+#             if len(results_pool) > 0:
+#                 result = results_pool
+#             results = result.order_by("song_name")
+#
+#             context = {'list': results}
+#             return render(request, 'Mylist/MyRecommend.html', context=context)
+#     return render(request, 'Mylist/MyRecommend.html', context=context)
 def exit(request):
     return render(request,'User/login.html')
 
