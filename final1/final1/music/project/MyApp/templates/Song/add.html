@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add rate</title>
+    <link rel="stylesheet"href="../../static/css/bootstrap.min.css">
+    <style>
+        h2{
+            padding-left: 60%;
+             margin-top: 4%;
+        }
+        input{
+            width: 120px;
+            font-size: 22px;
+            border-radius: 5px;
+        }
+          body{
+            background: url("../../static/img/364588097496461283.jpg") no-repeat center center fixed;
+            background-size: 100%;
+              font-size: 28px;
+        }
+         .bg{
+            width:500px;
+            height:300px;
+            margin-top: 5%;
+             margin-left: 50%;
+            background-color: rgba(142 ,229 ,238,0.5);
+        }
+        .btn input{ /*设置两个按钮的宽高、边距及边框样式*/
+             width: 130px;
+             height: 50px;
+             background: #87CEFF;
+             border-radius: 20px;
+            font-size: 18px;
+         }
+
+         .btn{
+            margin-left:83%;
+        }
+
+        .b1,.b2{
+            margin-left: 15% ;
+            padding-top:10%;
+        }
+    </style>
+</head>
+<body>
+  <h2>Add rate</h2>
+    <form >
+           {% csrf_token %}
+      <div class="bg">
+        <div class="b1">Song name：<input value="{{ song_ }}" type="text" readonly></div>
+        <div class="b2">Number to add: <input type="text"value="{{ num }}" name="number"></div>
+          </div>
+        <div class="btn">
+            <p class="btn1 btn-default"><input type="submit"value="Submit" onclick="alert('Success!')" formaction="/add/"formmethod="post"></p>
+            <p class="btn1 btn-default"><input type="submit" value="Return"name=""formaction="/allsong/"formmethod="get"></p>
+            </div>
+        </form>
+</body>
+</html>

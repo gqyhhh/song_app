@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete a song</title>
+    <link rel="stylesheet"href="../../static/css/bootstrap.min.css">
+    <style>
+             h2{
+            padding-left: 60%;
+             margin-top: 4%;
+        }
+        input{
+            width: 120px;
+            font-size: 22px;
+            border-radius: 5px;
+        }
+          body{
+            background: url("../../static/img/746774828442623303.jpg") no-repeat center center fixed;
+            background-size: 100%;
+              font-size: 28px;
+        }
+         .bg{
+            width:500px;
+            height:300px;
+            margin-top: 5%;
+             margin-left: 50%;
+            background-color: rgba(142 ,229 ,238,0.5);
+        }
+        .btn input{ /*设置两个按钮的宽高、边距及边框样式*/
+             width: 130px;
+             height: 50px;
+             background: white;
+             border-radius: 20px;
+            font-size: 18px;
+         }
+         .btn{
+            margin-left:83%;
+        }
+        .b1,.b2{
+            margin-left: 15% ;
+            padding-top:10%;
+        }
+    </style>
+</head>
+<body>
+<h2>Delete a song from your list</h2>
+<form method="post">
+    <div class="bg">
+        {% csrf_token %}
+        <!-- 这是我新加的！！！ -->
+        {% if request.session.is_login %}
+        <div class="b1">Current User：{{ request.session.user_name }}</div><br>
+              {% endif %}
+        <div class="b1">Song name:<input type="text"name="m_name"></div><br>
+        </div>
+    <div class="btn">
+        <p class="btn1 "><input type="submit"value="dislike"class="btn-default" formaction="/deletesong/"formmethod="post"></p>
+    </div>
+    <form method="post" class="f">
+    {% csrf_token %}
+    <input type="submit" class="btn-default" value="Exit" formaction="/allsong/" formmethod="post"style="    position: relative;
+    left: 320px;">
+</form>
+    {% if  status == 1 %}
+    <div class="text-center">
+    <h3 style="position: absolute;
+    top: 450px;
+    left: 747px;
+    font-size: 20px;
+    color: red;">{{ info }}</h3>
+    </div>
+{% elif  status == 2 %}
+    <div class="text-center">
+    <h3 style="position: absolute;
+    top: 450px;
+    left: 747px;
+    font-size: 20px;
+    color: red;">{{ info }}</h3>
+    </div>
+{% endif %}
+</body>
+</html>

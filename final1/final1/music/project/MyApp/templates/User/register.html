@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+        <link rel="stylesheet"href="../../static/css/bootstrap.min.css">
+    <style>
+        .hezi{
+            height: 300px;
+            width: 400px;
+            margin-top: 6%;
+            margin-left: 35%;
+            border-radius: 20px;
+            background-color: white;
+        }
+        body {
+            background-color: white;
+            background: url("../../static/img/xiandaiyiyuanlansediaoshuyedating_9400303_small.jpg")no-repeat center center fixed;
+            background-size: 100%;
+        }
+        .kuang1{
+            width: 180px;
+            height: 25px;
+            border-radius: 8px;
+            color:midnightblue;
+            padding-top: 2%;
+            margin-top: 2%;
+            margin-left: 5%;
+        }
+        .btn02{
+            height:35px;
+            width: 95px;
+            border-radius: 45px;
+            margin-left: 190px;
+        }
+        input{
+            border-color: lavender;
+            border-radius: 45px;
+            height: 18px;
+            margin-top: 5%;
+        }
+        .biaoyu{
+            margin-top: 5%;
+            color: black;
+            font-size: 36px;
+            font-family: "Adobe 黑体 Std R";
+            text-align: center;
+        }
+        #bg{
+            margin-left: 10%;
+            padding-top: 9%;
+        }
+        .btn02{
+            font-family:'Source Sans Pro', sans-serif;
+            width: 80px;
+            height: 30px;
+            border-radius: 10px;
+            float: right;
+            margin-right: 5%;
+            margin-top: 6%;
+        }
+    </style>
+</head>
+<body>
+{% if  status == 1 %}
+    <div class="text-center">
+    <h3 style="position: absolute;
+    top: 500px;
+    left: 747px;
+    font-size: 20px;
+    color: red;">{{ info }}</h3>
+    </div>
+{% elif  status == 2 %}
+    <div class="text-center">
+    <h3 style="position: absolute;
+    top: 500px;
+    left: 747px;
+    font-size: 20px;
+    color: red;">{{ info }}</h3>
+    </div>
+{% endif %}
+<p class="biaoyu">Register you account</p>
+<div class="hezi">
+<form action="/register/"method="post">
+    {% csrf_token %}
+    <div id="bg">
+    Name&nbsp;
+    <input class="kuang1" type="text"  maxlength="10"name="user_name"/></br></br>
+    Password&nbsp;
+    <input class="kuang1" type="password" size="40"name="pswd"/></br></br>
+    Gender：
+    <input class="kuang1" type="text" size="40"name="gender"/></br></br>
+    <input type="submit" class="btn02 btn btn-success"value="registerd!">
+    </div>
+</form>
+</div>
+</body>
+</html>
